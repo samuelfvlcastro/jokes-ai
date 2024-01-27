@@ -1,9 +1,12 @@
 package com.smashedbits.bot.worker;
 
+import java.util.List;
+
 import com.smashedbits.bot.shared.model.Subscriber;
 import com.smashedbits.bot.shared.services.Discord;
 import com.smashedbits.bot.shared.services.Subscribers;
 
+import io.vertx.core.spi.launcher.Command;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
 import jakarta.enterprise.event.Observes;
@@ -12,7 +15,9 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 @ApplicationScoped
 public class CommandsListener extends ListenerAdapter {
@@ -48,9 +53,16 @@ public class CommandsListener extends ListenerAdapter {
   }
 
   private void addCommands() {
+    OptionData data = new OptionData(OptionType.STRING, "category", "The category of joke you want", true)
+        .addChoices(
+            new Choice("Puns", "puns"),
+            new Choice("One-Liners", "one-liners"),
+            new Choice("Dirty", "dirty"),
+            new Choice("Knock-knock", "knock-knock"));
+
     provider.addCommand(
         Commands.slash("subscribe", "Subscribe to daily jokes")
-            .addOption(OptionType.STRING, "category", "The category of joke you want", true));
+            .addOptions(data));
   }
 
   private boolean insertSubscriber(User user, String category) {
